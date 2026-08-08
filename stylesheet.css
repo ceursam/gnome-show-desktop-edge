@@ -1,0 +1,16 @@
+/* Everything that has to match the dock (background colour, alpha, radii) is
+ * applied as an inline style at runtime by extension.js — it is read straight
+ * off the dock's own theme node so themes and dash-to-dock's transparency
+ * settings come along for free. Only the static bits live here. */
+
+.show-desktop-corner {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* Hover / press feedback, layered on top of the inherited dock background. */
+.show-desktop-corner-highlight {
+    background-color: rgba(255, 255, 255, 0.13);
+}

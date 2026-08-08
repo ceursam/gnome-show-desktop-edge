@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <enum id="org.gnome.shell.extensions.show-desktop-corner.corner">
+    <value value="0" nick="right"/>
+    <value value="1" nick="left"/>
+  </enum>
+
+  <schema id="org.gnome.shell.extensions.show-desktop-corner"
+          path="/org/gnome/shell/extensions/show-desktop-corner/">
+
+    <key name="button-width" type="i">
+      <default>14</default>
+      <range min="2" max="120"/>
+      <summary>Button width</summary>
+      <description>Width of the show-desktop bar, in logical pixels.</description>
+    </key>
+
+    <key name="edge-margin" type="i">
+      <default>0</default>
+      <range min="0" max="400"/>
+      <summary>Distance from the screen edge</summary>
+      <description>Gap between the bar and the screen edge, in logical pixels. 0 puts it flush in the corner, like Windows.</description>
+    </key>
+
+    <key name="corner" enum="org.gnome.shell.extensions.show-desktop-corner.corner">
+      <default>'right'</default>
+      <summary>Screen corner</summary>
+      <description>Which bottom corner the bar is pinned to.</description>
+    </key>
+
+    <key name="show-separator" type="b">
+      <default>true</default>
+      <summary>Show separator line</summary>
+      <description>Draw a faint hairline on the inner edge of the bar.</description>
+    </key>
+
+    <key name="hover-highlight" type="b">
+      <default>true</default>
+      <summary>Highlight on hover</summary>
+      <description>Brighten the bar while the pointer is over it.</description>
+    </key>
+
+    <key name="match-dock-height" type="b">
+      <default>true</default>
+      <summary>Match the dock's height</summary>
+      <description>Size the bar to the dock's background so it lines up with the icons. When off, or when no dock is found, the bar fills the reserved strip at the bottom of the screen.</description>
+    </key>
+
+  </schema>
+</schemalist>

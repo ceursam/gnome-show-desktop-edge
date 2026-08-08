@@ -1,0 +1,9 @@
+{
+  "name": "Show Desktop Corner",
+  "description": "A thin Windows-style \"Show Desktop\" bar pinned to the bottom-right corner of the screen. It measures Ubuntu Dock (dash-to-dock) at runtime and copies its height, colour, corner rounding and transparency, so it looks like a detached piece of the dock sitting in the corner.",
+  "shell-version": ["45", "46", "47", "48"],
+  "settings-schema": "org.gnome.shell.extensions.show-desktop-corner",
+  "gettext-domain": "show-desktop-corner",
+  "url": "",
+  "uuid": "custom-show-desktop-corner@custom-local"
+}
