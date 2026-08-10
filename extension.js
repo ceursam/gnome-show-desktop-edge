@@ -1,8 +1,8 @@
 /* 
 Show Desktop Corner
 A thin "show desktop" bar pinned to the bottom-right corner of the screen,
-sitting inside the strip that a non-autohiding Ubuntu Dock already reserves full space.
-*/
+sitting inside the strip that a non-autohiding Ubuntu Dock already reserves.
+ */
 
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
@@ -17,7 +17,7 @@ const DTD_SCHEMA = 'org.gnome.shell.extensions.dash-to-dock';
 
 const DOCK_NAME_PREFIX = 'dashtodock';
 
-const UPDATE_DELAY = 80;      
+const UPDATE_DELAY = 80;
 const SETTLE_DELAYS = [400, 1500, 4000];
 const FALLBACK_HEIGHT = 64;
 
@@ -99,6 +99,10 @@ export default class ShowDesktopCornerExtension extends Extension {
         this._minimized = [];
         this._lastFocus = null;
 
+        this._lastStyle = null;
+        this._lastRadiusCss = null;
+        this._lastGeometry = null;
+
         try {
             this._settings = this.getSettings();
         } catch (e) {
@@ -179,6 +183,7 @@ export default class ShowDesktopCornerExtension extends Extension {
         }
     }
 
+    /** Read a dash-to-dock key, tolerating keys that differ between versions. */
     _dock(getter, key, fallback) {
         try {
             if (!this._dockSettings)
@@ -410,13 +415,14 @@ export default class ShowDesktopCornerExtension extends Extension {
         const color = this._colorOf(this._dockBackground) ?? this._fallbackColor();
         const radii = this._dockRadii(scale);
 
+        const onRight = this._str('corner') !== 'left';
+        const tl = onRight ? radii[0] : 0;
+        const tr = onRight ? 0 : radii[1];
+        const br = onRight ? 0 : radii[2];
+        const bl = onRight ? radii[3] : 0;
+
         const alpha = (color.alpha / 255).toFixed(3);
-        const radiusCss = [
-            `border-top-left-radius: ${radii[0]}px;`,
-            `border-top-right-radius: ${radii[1]}px;`,
-            `border-bottom-right-radius: ${radii[2]}px;`,
-            `border-bottom-left-radius: ${radii[3]}px;`,
-        ].join(' ');
+        const radiusCss = `border-radius: ${tl}px ${tr}px ${br}px ${bl}px;`;
 
         let style = `background-color: rgba(${color.red}, ${color.green}, ${color.blue}, ${alpha}); ${radiusCss}`;
 
@@ -425,8 +431,15 @@ export default class ShowDesktopCornerExtension extends Extension {
             style += ` border-${side}: 1px solid rgba(255, 255, 255, 0.12);`;
         }
 
-        this._button.set_style(style);
-        this._highlight.set_style(radiusCss);
+        if (style !== this._lastStyle) {
+            this._button.set_style(style);
+            this._lastStyle = style;
+        }
+
+        if (radiusCss !== this._lastRadiusCss) {
+            this._highlight.set_style(radiusCss);
+            this._lastRadiusCss = radiusCss;
+        }
     }
 
     _dockRadii(scale) {
@@ -437,7 +450,6 @@ export default class ShowDesktopCornerExtension extends Extension {
                 return corners.map(c => Math.round(node.get_border_radius(c) / scale));
             }
         } catch (e) {
-            
         }
         return [8, 8, 8, 8];
     }
@@ -486,9 +498,18 @@ export default class ShowDesktopCornerExtension extends Extension {
             ? monitor.x + margin
             : monitor.x + monitor.width - width - margin;
 
-        this._button.set_size(width, Math.round(strip.height));
-        this._button.set_position(Math.round(x), Math.round(strip.y));
-        this._button.visible = strip.height > 1;
+        const height = Math.round(strip.height);
+        const left = Math.round(x);
+        const top = Math.round(strip.y);
+
+        const key = `${left},${top},${width},${height}`;
+        if (key !== this._lastGeometry) {
+            this._button.set_size(width, height);
+            this._button.set_position(left, top);
+            this._lastGeometry = key;
+        }
+
+        this._button.visible = height > 1;
     }
 
     _dockStrip() {
@@ -503,7 +524,6 @@ export default class ShowDesktopCornerExtension extends Extension {
                 if (bh > 1 && bh < monitor.height / 2)
                     return {monitor, y: by, height: bh};
             } catch (e) {
-                
             }
         }
 
